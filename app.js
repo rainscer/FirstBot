@@ -1,4 +1,4 @@
-const axios = require('axios').Axios;
+const axios = require('axios');
 const {Telegraf} = require('telegraf');
 const bot = new Telegraf('2082509203:AAEiiUsgrLeiXLX4q5AODpJpQD1n3N1ub-0');
 
@@ -12,27 +12,30 @@ bot.command('start', ctx => {
 
 bot.command('movies', ctx => {
     console.log(ctx.from)
+    let departments=[];
+    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
+        departments = response.data;
+    })
+
     bot.telegram.sendMessage(ctx.chat.id, 'Choose a cinema from the list below that you want to go to ',{
-        reply_markup: {
-            inline_keyboard: [
-                [
-                    {
-                        text: "American Decorative Arts",
-                        callback_data: 'American Decorative Arts'
-                    }
-                ],                
-            ]
-        }
+        reply_markup: JSON.stringify({
+            inline_keyboard: departments.map((displayName, departmentId) => ([{
+                text: displayName,
+                callback_data: String(departmentId),
+            }])),
+        }),
     })
 })
 
 bot.on('callback_query', query =>{
-    // const id = query.message.chat.id;
+    console.log(query)
+    const id = query.update.callback_query.message.chat.id;
     axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
         console.log(response.data)
-        const result = data.filter(item => item.displayName === query.data)[0];
+        let departments = response.data.departments;
+        const result = departments.filter(item => {return item.displayName === query.update.callback_query.data})[0];
         let md = `${result.displayName}`;
-        bot.sendMessage(id, md, {parse_mode:'markdown'})
+        bot.telegram.sendMessage(id, md, {parse_mode:'markdown'})
         })
     
 })
