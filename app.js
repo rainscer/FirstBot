@@ -1,54 +1,98 @@
-const Telegraf = require('telegraf').Telegraf;
-
+const axios = require('axios').Axios;
+const {Telegraf} = require('telegraf');
 const bot = new Telegraf('2082509203:AAEiiUsgrLeiXLX4q5AODpJpQD1n3N1ub-0');
+
+ 
 
 bot.command('start', ctx => {
     console.log(ctx.from)
-    bot.telegram.sendMessage(ctx.chat.id, 'Hello there! Welcome to Cinemaland bot. To book a ticket write "ticket"',{
+    bot.telegram.sendMessage(ctx.chat.id, 'Hello there! Welcome to Cinemaland bot. To book a ticket choose  /ticket',{
     })
 })
 
-bot.hears('ticket',ctx=> {
+bot.command('movies', ctx => {
     console.log(ctx.from)
-    let ticketMessage = 'great, choose the day of week for which you want to take a ticket';
-    ctx.deleteMessage();
-    bot.telegram.sendMessage(ctx.chat.id,ticketMessage,{
-            reply_markup: {
-                inline_keyboard: [
-                    [{
-                            text: "Thursday",
-                            callback_data: 'Thursday'
-                        },
-                        {
-                            text: "Friday",
-                            callback_data: 'Friday'
-                        },
-                        {
-                            text: "Saturday",
-                            callback_data: 'Saturday'
-                        }
-                    ],
-                    [
-                        {
-                            text: "Sunday",
-                            callback_data: 'Sunday'
-                        },
-                        {
-                            text: "Monday",
-                            callback_data: 'Monday'
-                        },
-                        {
-                            text: "Tuesday",
-                            callback_data: 'Tuesday'
-                        },
-                        {
-                            text: "Wednesday",
-                            callback_data: 'Wednesday'
-                        }
-                    ]
-                ]
-            }
+    bot.telegram.sendMessage(ctx.chat.id, 'Choose a cinema from the list below that you want to go to ',{
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: "American Decorative Arts",
+                        callback_data: 'American Decorative Arts'
+                    }
+                ],                
+            ]
+        }
+    })
+})
+
+bot.on('callback_query', query =>{
+    // const id = query.message.chat.id;
+    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
+        console.log(response.data)
+        const result = data.filter(item => item.displayName === query.data)[0];
+        let md = `${result.displayName}`;
+        bot.sendMessage(id, md, {parse_mode:'markdown'})
         })
+    
+})
+// bot.command('ticket',ctx=> {
+//     console.log(ctx.from)
+//     let ticketMessage = 'great, choose the day of week for which you want to take a ticket';
+//     ctx.deleteMessage();
+//     bot.telegram.sendMessage(ctx.chat.id,ticketMessage,{
+//             reply_markup: {
+//                 inline_keyboard: [
+//                     axios.get("http://46.101.212.195:3000/students").then(response => {
+//                         const data = response.data.data;
+//                         console.log(response.data)                        
+//                         })
+//                 ]
+//             }
+//         })
+// })
+
+bot.command('cinema', ctx => {
+    console.log(ctx.from)
+    bot.telegram.sendMessage(ctx.chat.id, 'Today the following cinemas cooperate with our bot:  Dovzhenko cinema ',{
+    })
+})
+
+
+
+bot.command('help',ctx=> {
+    console.log(ctx.from)
+    ctx.deleteMessage();
+    bot.telegram.sendMessage(ctx.chat.id,'info',{})
+       
+})
+
+bot.action('Dovzhenko cinema',ctx => {
+    console.log(ctx.from)    
+    bot.telegram.sendMessage(ctx.chat.id,'Great, now you can view the film',{
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: "Film1",
+                        callback_data: 'Film1'
+                    }
+                ],
+                [
+                    {
+                        text: "Film2",
+                        callback_data: 'Film2'
+                    }
+                ],
+                [
+                    {
+                        text: "Film3",
+                        callback_data: 'Film3'
+                    }
+                ]
+            ]
+        }
+      })
 })
 
 bot.action('Thursday',ctx => {
