@@ -14,17 +14,18 @@ bot.command('movies', ctx => {
     console.log(ctx.from)
     let departments=[];
     axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
-        departments = response.data;
+        departments = response.data.departments;
+        bot.telegram.sendMessage(ctx.chat.id, 'Choose a cinema from the list below that you want to go to ',{
+            reply_markup: JSON.stringify({
+                inline_keyboard: departments.map((department, departmentId) => ([{
+                    text: department.displayName,
+                    callback_data: String(department.departmentId),
+                }])),
+            }),
+        })
     })
 
-    bot.telegram.sendMessage(ctx.chat.id, 'Choose a cinema from the list below that you want to go to ',{
-        reply_markup: JSON.stringify({
-            inline_keyboard: departments.map((displayName, departmentId) => ([{
-                text: displayName,
-                callback_data: String(departmentId),
-            }])),
-        }),
-    })
+
 })
 
 bot.on('callback_query', query =>{
