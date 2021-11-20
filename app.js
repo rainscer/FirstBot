@@ -29,7 +29,7 @@ bot.command('departments', ctx => {
 bot.action( department.departmentId, ctx => {
     console.log(ctx.from)
     let objects=[];
-    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds'+departmentId).then((response)=>{
+    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='+departmentId).then((response)=>{
         objects = response.data.objects;
        console.log(response.data)
     })
