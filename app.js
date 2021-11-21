@@ -26,23 +26,23 @@ bot.command('departments', ctx => {
     })
 })
 
-bot.action( department.departmentId, ctx => {
-    console.log(ctx.from)
-    let objects=[];
-    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='+departmentId).then((response)=>{
-        objects = response.data.objects;
-       console.log(response.data)
-    })
-})
+// bot.action( department.departmentId, ctx => {
+//     console.log(ctx.from)
+//     let objects=[];
+//     axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='+departmentId).then((response)=>{
+//         objects = response.data.objects;
+//        console.log(response.data)
+//     })
+// })
 
 bot.on('callback_query', query =>{
     console.log(query)
     const id = query.update.callback_query.message.chat.id;
-    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
-        console.log(response.data)
-        let departments = response.data.departments;
-        const result = departments.filter(item => {return item.displayName === query.update.callback_query.data})[0];
-        let md = `${result.displayName}`;
+    axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='+query.update.callback_query.data).then((response)=>{
+        console.log(response.data) //тут всі id обєктів обраного відділу
+        let objects = response.data;
+      //  const result = departments.filter(item => {return item.displayName === })[0];
+        let md = 'всього у відділі експонатів ' + response.data.total; 
         bot.telegram.sendMessage(id, md, {parse_mode:'markdown'})
         })
     
