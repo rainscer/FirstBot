@@ -27,6 +27,7 @@ bot.command('departments', ctx => {
 })
 
 bot.on('callback_query', query =>{
+    //Sladkova
     const btn = {
         "reply_markup": JSON.stringify({
             "inline_keyboard":[
@@ -81,6 +82,7 @@ Country where created: ${object.geographyType} ${object.country}
 
             bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}) 
             bot.telegram.sendMessage(id, md, {parse_mode:'markdown'})
+            //Sladkova
             bot.telegram.sendMessage(id, btn, {parse_mode:'markdown'})             
         })
 
