@@ -28,22 +28,23 @@ bot.command('departments', ctx => {
 
 bot.on('callback_query', query =>{
     //Sladkova
-    const btn = {
-        "reply_markup": JSON.stringify({
-            "inline_keyboard":[
+    const btn ={
+        reply_markup: {
+            inline_keyboard: [
                 [
-                    {
-                    text: "More",
-                    callback_data: "More"                            
-                    },
-                    {
-                        text: "Next",
-                        callback_data: "Next"                            
-                    }
+                                    {
+                                    text: "               More               ",
+                                    callback_data: "More"                            
+                                    },
+                                    {
+                                        text: "             Next              ",
+                                        callback_data: "Next"                            
+                                    }
                 ],
             ]
-        })
-    };
+        }
+    }
+
     let objects=[];
     let object=[];
     console.log(query)
@@ -80,10 +81,13 @@ Date when an artwork was created: ${object.objectDate}
 Country where created: ${object.geographyType} ${object.country} 
 `; 
 
-            bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}) 
-            bot.telegram.sendMessage(id, md, {parse_mode:'markdown'})
-            //Sladkova
-            bot.telegram.sendMessage(id, btn, {parse_mode:'markdown'})             
+            bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}).then(()=>{
+                bot.telegram.sendMessage(id, md, {parse_mode:'markdown'}).then(()=>{
+                //Sladkova
+                bot.telegram.sendMessage(id, "TEXT", btn)   
+                });
+            })
+                    
         })
 
 
