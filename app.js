@@ -26,9 +26,12 @@ bot.command('departments', ctx => {
 
 bot.on('callback_query', query =>{
     const id = query.update.callback_query.message.chat.id;
+    let objects=[];
+    let object=[];    
     switch (query.update.callback_query.data) {
+ 
         case 'Change':
-            bot.telegram.sendMessage(id, 'Hello')
+            // bot.telegram.sendMessage(id, 'Hello')
             let departments=[];
             axios.get('https://collectionapi.metmuseum.org/public/collection/v1/departments').then((response)=>{
                 departments = response.data.departments;
@@ -42,22 +45,29 @@ bot.on('callback_query', query =>{
                 })
             })
             break;
-            case 'Next':
-                bot.telegram.sendMessage(id, 'Hello')
-                break;
+            // case 'Next':    
+            // bot.telegram.sendMessage(id, 'Hello')
+            // break;
+            // case 'More': 
+            // bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}).then(()=>{
+            //     bot.telegram.sendMessage(id, md, {parse_mode:'markdown'}).then(()=>{
+            //         bot.telegram.sendMessage(id,"choose button, if you want learn more press - More. If you want change artwork, press - Next. If you want change department, press - Change", btn)
+            //     });
+            // })          
+            // break;
             default:
                 const btn ={
                     reply_markup: {
                         inline_keyboard: [
                             [
-                                                {
-                                                text: " More  ",
-                                                callback_data: "More"                            
-                                                },
-                                                {
-                                                    text: " Next",
-                                                    callback_data: "Next"                            
-                                                },
+                                                // {
+                                                // text: " More  ",
+                                                // callback_data: "More"                            
+                                                // },
+                                                // {
+                                                //     text: " Next",
+                                                //     callback_data: "Next"                            
+                                                // },
                                                 {
                                                     text: "Change",
                                                     callback_data: "Change"                            
@@ -65,13 +75,10 @@ bot.on('callback_query', query =>{
                             ],
                         ]
                     }
-                }
-
-                let objects=[];
-                let object=[];
+                }    
                 
-                console.log('!!!', query.update.callback_query)
-            
+                
+                console.log('!!!', query.update.callback_query)           
                 axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='+query.update.callback_query.data).then((response)=>{
                     objects = response.data; 
                     console.log(objects)
@@ -79,7 +86,7 @@ bot.on('callback_query', query =>{
                     axios.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+randomId).then((response)=>{
                         console.log(response.data)
                         object = response.data;
-
+            
                         if(object.primaryImage == ''){
                             object.primaryImage = 'https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png'
                         } 
@@ -95,27 +102,47 @@ bot.on('callback_query', query =>{
                         if(object.country == ''){
                             object.country = 'unknown'
                         }
-
+                        if(object.culture == ''){
+                            object.culture = 'unknown'
+                        }
+                         if(object.portfolio == ''){
+                            object.portfolio = 'unknown'
+                        }
+                        if(object.GalleryNumber == ''){
+                            object.GalleryNumber = 'unknown'
+                        }
+            
                         let img = object.primaryImage;
                         let md = `
                             Name artwork: ${object.title}
-            Artist: ${object.artistDisplayName}
-            Date when an artwork was created: ${object.objectDate} 
-            Country where created: ${object.geographyType} ${object.country} 
-            `; 
 
-                        bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}).then(()=>{
-                            bot.telegram.sendMessage(id, md, {parse_mode:'markdown'}).then(()=>{
-                                console.log("1");
-                                bot.telegram.sendMessage(id,"choose button, if you want learn more press - More. If you want change artwork, press - Next. If you want change department, press - Change", btn)
-                                console.log("2");
+Artist: ${object.artistDisplayName} (${object.artistBeginDate} - ${object.artistEndDate})
+
+Date when an artwork was created: ${object.objectDate}  (${object.objectBeginDate} - ${object.objectEndDate})
+
+Country where created: ${object.geographyType} ${object.country} 
+
+Culture, or people from which an object was created: ${object.culture} 
+
+A set of works created as a group or published as a series: ${object.portfolio}
+
+Gallery number, where available: ${object.GalleryNumber}
+
+---------------------------------
+
+More info on our site: ${object.objectURL}    
+`; 
+            
+                bot.telegram.sendPhoto(id, img, {parse_mode:'markdown'}).then(()=>{
+                    bot.telegram.sendMessage(id, md, {parse_mode:'markdown'}).then(()=>{
+                        bot.telegram.sendMessage(id,"If you want change department, press - Change", btn)
                             });
                         }) 
-                
                     })
-                }) 
-            }
+                })  
+        }  
 })
+
 
 
 bot.launch(); 
